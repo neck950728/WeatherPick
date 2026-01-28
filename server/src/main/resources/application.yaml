@@ -1,0 +1,13 @@
+server:
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: weatherpick-server
+  profiles:
+    active: dev
