@@ -1,0 +1,60 @@
+@use '@/styles/sizes' as s; // '@' 경로 별칭 사용(vite.config.js에서 alias 설정 필요)
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    padding: 10px;
+    background-color: rgb(156, 156, 156);
+    border-radius: 12px;
+}
+
+.searchInput {
+    display: block;
+    width: s.$max-content-width;
+    height: 35px;
+    margin: 0 auto;
+    padding-left: 10px;
+    border: none;
+    border-radius: 12px;
+}
+
+.searchInput:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+.nav {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    right: 10px;
+}
+
+.link {
+    padding: 10px;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 12px;
+}
+
+.link:hover {
+    background-color: rgb(100, 100, 100);
+}
+
+@media (max-width: 1050px) {
+    .wrapper {
+        align-items: center;
+        gap: 10px;
+    }
+
+    .searchSection {
+        align-self: stretch;
+    }
+
+    .nav {
+        position: unset;
+    }
+}

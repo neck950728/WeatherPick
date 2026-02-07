@@ -1,0 +1,10 @@
+* {
+    box-sizing: border-box;
+}
+
+.pageContainer{
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

@@ -1,0 +1,134 @@
+@use '@/styles/sizes' as s; // '@' 경로 별칭 사용(vite.config.js에서 alias 설정 필요)
+
+.weatherCard {
+  width: s.$max-content-width;
+  margin: 24px auto;
+  padding: 18px 22px;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, #2b2b2b 0%, #1f1f1f 100%);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.searchResult {
+  font-size: 13px;
+  opacity: 0.9;
+  margin-bottom: 10px;
+}
+
+.region {
+  font-weight: 700;
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.left {
+  flex: 1;
+}
+
+.iconTempRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.weatherIcon {
+  width: 60px;
+  height: 60px;
+  display: block;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.tempBlock {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.tempRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.temp {
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.tempUnit {
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.metrics {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+
+.metric {
+  white-space: nowrap;
+}
+
+.right {
+  text-align: right;
+  min-width: 220px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.datetime {
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.condition {
+  font-size: 16px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.recommendation {
+  width: s.$max-content-width;
+  margin: 8px auto 24px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #111;
+  color: #eaeaea;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 640px) {
+  .cardBody {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .right {
+    width: 100%;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .temp {
+    font-size: 56px;
+  }
+}
