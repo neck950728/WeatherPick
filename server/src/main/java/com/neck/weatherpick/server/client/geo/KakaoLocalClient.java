@@ -23,6 +23,7 @@ public class KakaoLocalClient {
             "documents": [
                 {
                     "address_name": "인천 부평구 부평동 224-1",
+                    "place_name": "부평문화의거리",
                     "x": "126.724277577653",
                     "y": "37.4941629743516",
                     ...
@@ -46,18 +47,21 @@ public class KakaoLocalClient {
                 .bodyToMono(KakaoKeywordResponse.class) // JSON → KakaoKeywordResponse 객체로 변환(Mono : 응답이 0 ~ 1개인 경우 / Flux : 0 ~ 여러 개)
                 .block(); // 완료될 때까지 대기
 
-        // x(경도), y(위도)
+        String addressName = res.documents[0].address_name;
+        String placeName = res.documents[0].place_name;
         double lon = Double.parseDouble(res.documents[0].x);
         double lat = Double.parseDouble(res.documents[0].y);
-        return new LatLon(lat, lon);
+        return new LatLon(addressName, placeName, lat, lon);
     }
 
     static class KakaoKeywordResponse {
         public Document[] documents;
 
         static class Document {
-            public String x; // longitude
-            public String y; // latitude
+            public String address_name; // 실제 조회된 지역의 주소
+            public String place_name;   // 실제 조회된 지역의 장소명
+            public String x;            // longitude(경도)
+            public String y;            // latitude(위도)
         }
     }
 }

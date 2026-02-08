@@ -30,11 +30,15 @@ public class WeatherService {
 
     public WeatherNowResponse getNowByRegion(String region) {
         LatLon latLon = kakaoLocalClient.keywordToLatLon(region); // 1. 해당 지역(region)의 위ㆍ경도 조회  →  카카오맵 API 이용
-        KmaGridPoint kmaGridPoint = KmaGridConverter.convert(latLon.lat(), latLon.lon()); // 2. 위ㆍ경도를 기상청 격자 좌표로 변환
-        return getNow(kmaGridPoint, region); // 3. 기상청 격자 좌표에 해당하는 지점(region)의 날씨를 조회  →  공공데이터포털 API 이용
+        String addressName = latLon.addressName(), placeName = latLon.placeName();
+        double lat = latLon.lat(), lon = latLon.lon();
+
+        KmaGridPoint kmaGridPoint = KmaGridConverter.convert(lat, lon); // 2. 위ㆍ경도를 기상청 격자 좌표로 변환
+
+        return getNow(kmaGridPoint, addressName, placeName); // 3. 기상청 격자 좌표에 해당하는 지점(addressName)의 날씨를 조회  →  공공데이터포털 API 이용
     }
 
-    private WeatherNowResponse getNow(KmaGridPoint kmaGridPoint, String regionLabel) {
+    private WeatherNowResponse getNow(KmaGridPoint kmaGridPoint, String resolvedAddress, String resolvedPlaceName) {
         LocalDateTime nowKst = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
         KmaTime.BaseDt ncstBase = KmaTime.latestUltraSrtNcstBase(nowKst);
@@ -65,7 +69,7 @@ public class WeatherService {
 
         String skyType = extractSkyType(nowKst, kmaGridPoint);
 
-        return new WeatherNowResponse(regionLabel, t1h, rn1, reh, wsd, precipType, skyType);
+        return new WeatherNowResponse(resolvedAddress, resolvedPlaceName, t1h, rn1, reh, wsd, precipType, skyType);
     }
 
     private String extractSkyType(LocalDateTime nowKst, KmaGridPoint kmaGridPoint) {
