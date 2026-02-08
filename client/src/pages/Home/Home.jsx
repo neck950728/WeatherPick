@@ -1,38 +1,26 @@
-import React, { useEffect, useMemo } from 'react';
-import { apiFetch } from '../../api/api';
+import React, { useMemo } from 'react';
 import styles from './Home.module.scss';
+import loadingGif from './imgs/loading.gif';
 
-const weatherIcons = import.meta.glob('./imgs/*.png', {eager: true, import: 'default' });
+const weatherIcons = import.meta.glob('./imgs/*.png', { eager: true, import: 'default' });
 const getWeatherIconSrc = (skyType, precipType) => {
     const key = `./imgs/${skyType}_${precipType}.png`;
     return weatherIcons[key];
 };
 
-const Home = () => {
-    const mockResponse = {
-        weather: {
-            regionLabel: '갈산역',
-            tempC: 3,
-            precipitation1hMm: 0,
-            humidity: 42,
-            windSpeedMs: 1.8,
-            precipType: 'RAIN',
-            skyType: 'CLEAR'
-        },
-        message: '- 옷차림 : 니트, 자켓, 청바지\n- 준비물 : 마스크, 손수건'
-    };
-
-    useEffect(() => {
-        /*
-            apiFetch(`/api/weather/now?region=갈산역`)
-                .then(res => {
-                    console.log(res);
-                });
-        */
-    }, []);
-
+const Home = ({ regionQuery, weatherResponse, isLoading, errorMessage }) => {
     const viewModel = useMemo(() => {
-        const { weather } = mockResponse;
+        /*
+            - Optional Chaining 문법 -
+            if(!weatherResponse?.weather)는
+            if(weatherResponse == null || !weatherResponse.weather)와 동일하게 동작함
+            즉, weatherResponse가 null 또는 undefined이거나, weatherResponse.weather가 falsy이면, return null
+            ※느슨한 비교(==) : null == undefined // true
+            ※falsy 종류 : false, 0, '', null, undefined, NaN
+        */
+        if(!weatherResponse?.weather) return null;
+
+        const { weather } = weatherResponse;
 
         const precipLabelMap = {
             NONE: '',
@@ -47,7 +35,7 @@ const Home = () => {
         const skyLabelMap = {
             CLEAR: '맑음',
             PARTLY_CLOUDY: '구름 많음',
-            CLOUDY: '흐림'
+            CLOUDY: '흐림',
         };
 
         const precipLabel = precipLabelMap[weather.precipType];
@@ -66,7 +54,7 @@ const Home = () => {
 
         const hours = now.getHours();
         const isPm = hours >= 12;
-        const displayHour = ((hours + 11) % 12) + 1; // 24시간제(0 ~ 23시) → 12시간제(1 ~ 12시) 변환
+        const displayHour = ((hours + 11) % 12) + 1; // // 24시간제(0 ~ 23시) → 12시간제(1 ~ 12시) 변환
         const minutes = String(now.getMinutes()).padStart(2, '0'); // ex) 1 → 01
         const dayText = `(${weekdayMap[now.getDay()]})`;
         const timeText = `${isPm ? 'PM' : 'AM'} ${displayHour}:${minutes}`;
@@ -74,7 +62,8 @@ const Home = () => {
         const iconSrc = getWeatherIconSrc(weather.skyType, weather.precipType);
 
         return {
-            regionLabel: weather.regionLabel,
+            resolvedAddress: weather.resolvedAddress,
+            resolvedPlaceName: weather.resolvedPlaceName,
             tempC: weather.tempC,
             precipitation1hMm: weather.precipitation1hMm,
             humidity: weather.humidity,
@@ -84,50 +73,85 @@ const Home = () => {
             conditionText,
             iconSrc
         };
-    }, []);
+    }, [weatherResponse]);
 
     return (
         <main>
             <section>
-                <article>
-                    <div className={styles.weatherCard}>
-                        <header className={styles.searchResult}>
-                            검색 결과 : <span className={styles.region}>{viewModel.regionLabel}</span>
-                        </header>
+                {!regionQuery && !weatherResponse && !isLoading && !errorMessage && (
+                    <article>
+                        <div className={styles.weatherCard}>
+                            <header className={styles.searchResult}>
+                                상단 입력창에 지역을 입력해 주세요.
+                            </header>
+                        </div>
+                    </article>
+                )}
 
-                        <section className={styles.cardBody}>
-                            <section className={styles.left}>
-                                <div className={styles.iconTempRow}>
-                                    <img className={styles.weatherIcon} src={viewModel.iconSrc} />
-                                    <div className={styles.tempBlock}>
-                                        <div className={styles.tempRow}>
-                                            <span className={styles.temp}>{viewModel.tempC}</span>
-                                            <span className={styles.tempUnit}>°C</span>
+                {isLoading && (
+                    <article>
+                        <div className={styles.weatherCard}>
+                            <header className={styles.searchResult}>
+                                '{regionQuery}' 날씨를 불러오는 중... <img className={styles.loadingIcon} src={loadingGif} />
+                            </header>
+                        </div>
+                    </article>
+                )}
+
+                {!isLoading && errorMessage && (
+                    <article>
+                        <div className={styles.weatherCard}>
+                            <header className={styles.searchResult}>
+                                오류 : {errorMessage}
+                            </header>
+                        </div>
+                    </article>
+                )}
+
+                {!isLoading && !errorMessage && viewModel && (
+                    <>
+                        <article>
+                            <div className={styles.weatherCard}>
+                                <header className={styles.searchResult}>
+                                    <div>장소 : <span className={styles.resolvedLocation}>{viewModel.resolvedPlaceName}</span></div>
+                                    <div>주소 : <span className={styles.resolvedLocation}>{viewModel.resolvedAddress}</span></div>
+                                </header>
+
+                                <section className={styles.cardBody}>
+                                    <section className={styles.left}>
+                                        <div className={styles.iconTempRow}>
+                                            <img className={styles.weatherIcon} src={viewModel.iconSrc} />
+                                            <div className={styles.tempBlock}>
+                                                <div className={styles.tempRow}>
+                                                    <span className={styles.temp}>{viewModel.tempC}</span>
+                                                    <span className={styles.tempUnit}>°C</span>
+                                                </div>
+                                                <div className={styles.metrics}>
+                                                    <div className={styles.metric}>1시간 강수량 : {viewModel.precipitation1hMm}mm</div>
+                                                    <div className={styles.metric}>습도 : {viewModel.humidity}%</div>
+                                                    <div className={styles.metric}>풍속 : {viewModel.windSpeedMs}m/s</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className={styles.metrics}>
-                                            <div className={styles.metric}>1시간 강수량 : {viewModel.precipitation1hMm}mm</div>
-                                            <div className={styles.metric}>습도 : {viewModel.humidity}%</div>
-                                            <div className={styles.metric}>풍속 : {viewModel.windSpeedMs}m/s</div>
+                                    </section>
+
+                                    <aside className={styles.right}>
+                                        <div className={styles.title}>날씨</div>
+                                        <div className={styles.datetime}>
+                                            <span className={styles.day}>{viewModel.dayText}</span>
+                                            <time className={styles.time}>{viewModel.timeText}</time>
                                         </div>
-                                    </div>
-                                </div>
-                            </section>
+                                        <div className={styles.condition}>{viewModel.conditionText}</div>
+                                    </aside>
+                                </section>
+                            </div>
+                        </article>
 
-                            <aside className={styles.right}>
-                                <div className={styles.title}>날씨</div>
-                                <div className={styles.datetime}>
-                                    <span className={styles.day}>{viewModel.dayText}</span>
-                                    <time className={styles.time}>{viewModel.timeText}</time>
-                                </div>
-                                <div className={styles.condition}>{viewModel.conditionText}</div>
-                            </aside>
-                        </section>
-                    </div>
-                </article>
-
-                <article>
-                    <pre className={styles.recommendation}>{mockResponse.message}</pre>
-                </article>
+                        <article>
+                            <pre className={styles.recommendation}>{weatherResponse?.message}</pre>
+                        </article>
+                    </>
+                )}
             </section>
         </main>
     );

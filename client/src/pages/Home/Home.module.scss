@@ -13,10 +13,14 @@
 .searchResult {
   font-size: 13px;
   opacity: 0.9;
-  margin-bottom: 10px;
 }
 
-.region {
+.loadingIcon {
+  width: 25px;
+  vertical-align: bottom;
+}
+
+.resolvedLocation {
   font-weight: 700;
 }
 
@@ -25,6 +29,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  margin-top: 5px;
 }
 
 .left {
