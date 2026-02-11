@@ -3,8 +3,8 @@ package com.neck.weatherpick.server.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.neck.weatherpick.server.client.ai.OpenAiResponsesClient;
 import com.neck.weatherpick.server.dto.WeatherNowResponse;
-import com.neck.weatherpick.server.dto.WeatherRecommendationResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,7 +12,12 @@ import org.springframework.stereotype.Service;
 public class OutfitRecommendationService {
     private final OpenAiResponsesClient openAi;
 
-    public WeatherRecommendationResponse recommend(WeatherNowResponse weather) {
+    @Cacheable(
+            cacheNames = "aiReco",
+            key = "T(com.neck.weatherpick.server.cache.CacheKeys).aiKey(#p0)",
+            unless = "#result == null"
+    )
+    public String recommend(WeatherNowResponse weather) {
         String system = """
                 너는 제공된 날씨 정보를 기반으로 옷차림 및 준비물을 추천하는 엔진이다.
                 (설명/사족 일절 금지)
@@ -45,7 +50,6 @@ public class OutfitRecommendationService {
         );
 
         JsonNode json = openAi.createTextResponse(system, user);
-        String raw = OpenAiResponsesClient.extractOutputText(json);
-        return new WeatherRecommendationResponse(weather, raw);
+        return OpenAiResponsesClient.extractOutputText(json);
     }
 }

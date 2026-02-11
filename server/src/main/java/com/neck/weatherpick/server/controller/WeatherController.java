@@ -20,6 +20,7 @@ public class WeatherController {
     @GetMapping("/now")
     public WeatherRecommendationResponse now(@RequestParam("region") String region) {
         WeatherNowResponse weather = weatherService.getNowByRegion(region);
-        return outfitRecommendationService.recommend(weather);
+        String message = outfitRecommendationService.recommend(weather);
+        return new WeatherRecommendationResponse(weather, message);
     }
 }

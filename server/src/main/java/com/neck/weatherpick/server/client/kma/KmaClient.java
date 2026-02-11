@@ -6,6 +6,7 @@ import com.neck.weatherpick.server.client.kma.dto.response.ncst.NcstResponse;
 import com.neck.weatherpick.server.client.kma.dto.response.fcst.FcstResponse;
 import com.neck.weatherpick.server.client.kma.support.KmaTime;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -42,6 +43,11 @@ public class KmaClient {
         아직 반영이 안 된 것이므로 직전 시각의 데이터라도 재요청한다.
     */
 
+    @Cacheable(
+            cacheNames = "kmaNcst",
+            key = "T(com.neck.weatherpick.server.cache.CacheKeys).kmaKey(#p0, #p1, #p2)",
+            unless = "#result == null"
+    )
     public NcstResponse getUltraSrtNcst(String baseDate, String baseTime, KmaGridPoint kmaGridPoint) {
         // 1차 시도
         NcstResponse ncstResponse = requestUltraSrtNcst(baseDate, baseTime, kmaGridPoint);
@@ -54,6 +60,11 @@ public class KmaClient {
         return requestUltraSrtNcst(prev.baseDate(), prev.baseTime(), kmaGridPoint);
     }
 
+    @Cacheable(
+            cacheNames = "kmaFcst",
+            key = "T(com.neck.weatherpick.server.cache.CacheKeys).kmaKey(#p0, #p1, #p2)",
+            unless = "#result == null"
+    )
     public FcstResponse getUltraSrtFcst(String baseDate, String baseTime, KmaGridPoint kmaGridPoint) {
         // 1차 시도
         FcstResponse fcstResponse = requestUltraSrtFcst(baseDate, baseTime, kmaGridPoint);

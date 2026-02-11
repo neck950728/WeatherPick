@@ -1,6 +1,7 @@
 package com.neck.weatherpick.server.client.geo;
 
 import com.neck.weatherpick.server.client.geo.dto.request.LatLon;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -33,6 +34,11 @@ public class KakaoLocalClient {
             ...
         }
     */
+    @Cacheable(
+            cacheNames = "kakaoGeo",
+            key = "T(com.neck.weatherpick.server.cache.CacheKeys).geoKey(#p0)",
+            unless = "#result == null"
+    )
     public LatLon keywordToLatLon(String regionName) {
         String query = regionName.trim();
 
