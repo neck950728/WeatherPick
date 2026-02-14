@@ -5,14 +5,31 @@ import com.neck.weatherpick.server.dto.WeatherNowResponse;
 
 /**
  * <h5>SpEL(@Cacheable key = ...)에서 사용하기 위한 캐시 Key 생성 유틸 클래스</h5>
- * 캐시 Key를 생성할 땐 가능하다면 '완전 동일'보다는, 아래 aiKey처럼 비슷한 상황을 묶어 '구간화'하는 것이 좋다.
+ * 캐시 Key를 생성할 땐 가능하다면 '완전 동일'보다는, 아래 kakaoCoordToAddressKey 및 aiKey처럼 비슷한 상황을 묶어 '구간화'하는 것이 좋다.
  * 그래야 적중률(다시 계산하지 않고, 캐시에서 값을 가져오는 비율)이 올라가기 때문이다.
  */
 public final class CacheKeys {
     private CacheKeys() {}
 
-    public static String geoKey(String regionName) {
+    public static String kakaoKeywordToLonLatKey(String regionName) {
         return regionName.trim();
+    }
+
+    // https://naver.me/5If20SNh 참고
+    public static String kakaoCoordToAddressKey(double lon, double lat) {
+        /*
+            소수점 넷째 자리까지 반올림
+            ex 1) 3.141592 → 3.1416
+            ex 2) 126.7247245 → 126.7247
+        */
+        double qLon = round(lon, 4);
+        double qLat = round(lat, 4);
+        return "lon=" + qLon + "|lat=" + qLat;
+    }
+
+    private static double round(double value, int scale) {
+        double factor = Math.pow(10, scale);
+        return Math.round(value * factor) / factor;
     }
 
     public static String kmaKey(String baseDate, String baseTime, KmaGridPoint p) {

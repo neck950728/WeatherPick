@@ -17,6 +17,11 @@ export const apiFetch = async (path, options = {}) => {
         A. fetch는 네트워크 에러(서버 다운, CORS, 네트워크 단절 등)가 발생했을 때만 throw한다고 한다.
            즉, HTTP 에러(404, 500 등)는 정상 응답이라 판단하고 throw하지 않는다.
     */
-    if(!res.ok) throw new Error('조회 실패');
+    if(!res.ok) {
+        const err = new Error();
+        err.status = res.status;
+        throw err;
+    }
+
     return res.json();
 };

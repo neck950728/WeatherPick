@@ -1,1 +1,4 @@
-$max-content-width: min(700px, 100%);
+$breakpoint-mobile: 640px; // 640px 이하 : 모바일 환경(휴대폰 ~ 소형 태블릿)이라고 판단
+
+$content-max-width: 700px;
+$max-content-width: min($content-max-width, 100%);

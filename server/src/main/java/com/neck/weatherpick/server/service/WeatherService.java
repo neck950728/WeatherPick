@@ -1,7 +1,7 @@
 package com.neck.weatherpick.server.service;
 
 import com.neck.weatherpick.server.client.geo.KakaoLocalClient;
-import com.neck.weatherpick.server.client.geo.dto.request.LatLon;
+import com.neck.weatherpick.server.client.geo.dto.request.LonLat;
 import com.neck.weatherpick.server.client.kma.KmaClient;
 import com.neck.weatherpick.server.client.kma.dto.request.KmaGridPoint;
 import com.neck.weatherpick.server.client.kma.dto.response.ncst.NcstItem;
@@ -29,13 +29,19 @@ public class WeatherService {
     }
 
     public WeatherNowResponse getNowByRegion(String region) {
-        LatLon latLon = kakaoLocalClient.keywordToLatLon(region); // 1. 해당 지역(region)의 위ㆍ경도 조회  →  카카오맵 API 이용
-        String addressName = latLon.addressName(), placeName = latLon.placeName();
-        double lat = latLon.lat(), lon = latLon.lon();
+        LonLat lonLat = kakaoLocalClient.keywordToLonLat(region); // 1. 해당 지역(region)의 위ㆍ경도 조회  →  카카오맵 API 이용
+        String addressName = lonLat.addressName(), placeName = lonLat.placeName();
+        double lon = lonLat.lon(), lat = lonLat.lat();
 
-        KmaGridPoint kmaGridPoint = KmaGridConverter.convert(lat, lon); // 2. 위ㆍ경도를 기상청 격자 좌표로 변환
+        KmaGridPoint kmaGridPoint = KmaGridConverter.convert(lon, lat); // 2. 위ㆍ경도를 기상청 격자 좌표로 변환
 
         return getNow(kmaGridPoint, addressName, placeName); // 3. 기상청 격자 좌표에 해당하는 지점(addressName)의 날씨를 조회  →  공공데이터포털 API 이용
+    }
+
+    public WeatherNowResponse getNowByCoord(double lon, double lat) {
+        String addressName = kakaoLocalClient.coordToAddress(lon, lat);
+        KmaGridPoint kmaGridPoint = KmaGridConverter.convert(lon, lat);
+        return getNow(kmaGridPoint, addressName, null);
     }
 
     private WeatherNowResponse getNow(KmaGridPoint kmaGridPoint, String resolvedAddress, String resolvedPlaceName) {

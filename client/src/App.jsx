@@ -3,7 +3,18 @@ import { useCallback, useState } from 'react';
 import Header from './components/Header/Header';
 import Home from './pages/Home/Home';
 import { apiFetch } from './api/api';
+import { Toaster } from 'react-hot-toast';
 import styles from './App.module.scss';
+
+const ERROR_MESSAGES = {
+  429: '외부 API 서버 오류 : 잠시 후 이용해 주세요.',
+  500: '오류 : 조회 실패'
+};
+
+const handleApiError = (e, setWeatherResponse, setErrorMessage) => {
+  setWeatherResponse(null);
+  setErrorMessage(ERROR_MESSAGES[e.status]);
+};
 
 function App() {
   const [regionQuery, setRegionQuery] = useState('');
@@ -28,9 +39,21 @@ function App() {
     try {
       const res = await apiFetch(`/api/weather/now?region=${encodeURIComponent(trimmed)}`);
       setWeatherResponse(res);
-    }catch(err) {
-      setWeatherResponse(null);
-      setErrorMessage(err.message);
+    }catch(e) {
+      handleApiError(e, setWeatherResponse, setErrorMessage);
+    }finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleCurrentLocation = useCallback(async (lon, lat) => {
+    setIsLoading(true);
+
+    try {
+      const res = await apiFetch(`/api/weather/now?lon=${lon}&lat=${lat}`);
+      setWeatherResponse(res);
+    }catch(e) {
+      handleApiError(e, setWeatherResponse, setErrorMessage);
     }finally {
       setIsLoading(false);
     }
@@ -38,7 +61,9 @@ function App() {
 
   return (
     <>
-      <Header onSearch={handleSearch} defaultValue={regionQuery} isLoading={isLoading} />
+      <Toaster position="top-center" toastOptions={{ duration: 2000 }} />
+
+      <Header onSearch={handleSearch} onCurrentLocation={handleCurrentLocation} defaultValue={regionQuery} isLoading={isLoading} />
       <main className={styles.pageContainer}>
         <Routes>
           <Route

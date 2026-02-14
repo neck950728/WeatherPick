@@ -10,11 +10,19 @@
     border-radius: 12px;
 }
 
-.searchInput {
-    display: block;
+.searchSection {
+    display: flex;
     width: s.$max-content-width;
-    height: 35px;
     margin: 0 auto;
+}
+
+.searchForm {
+    flex: 1;
+}
+
+.searchInput {
+    width: 100%;
+    height: 35px;
     padding-left: 10px;
     border: none;
     border-radius: 12px;
@@ -23,6 +31,17 @@
 .searchInput:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+.currentLocationIcon {
+    width: 35px;
+    height: 35px;
+}
+
+.currentLocationIcon:hover {
+    // 이미지 색상 변경 : https://codepen.io/sosuke/pen/Pjoqqp
+    filter: invert(91%) sepia(61%) saturate(15%) hue-rotate(293deg) brightness(108%) contrast(100%);
+    cursor: pointer;
 }
 
 .nav {
@@ -44,14 +63,11 @@
     background-color: rgb(100, 100, 100);
 }
 
-@media (max-width: 1050px) {
+$breakpoint-header: s.$content-max-width + 400px;
+@media (max-width: $breakpoint-header) {
     .wrapper {
         align-items: center;
         gap: 10px;
-    }
-
-    .searchSection {
-        align-self: stretch;
     }
 
     .nav {

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styles from './Home.module.scss';
-import loadingGif from './imgs/loading.gif';
+import loadingIcon from './imgs/loadingIcon.gif';
 
 const weatherIcons = import.meta.glob('./imgs/*.png', { eager: true, import: 'default' });
 const getWeatherIconSrc = (skyType, precipType) => {
@@ -92,7 +92,7 @@ const Home = ({ regionQuery, weatherResponse, isLoading, errorMessage }) => {
                     <article>
                         <div className={styles.weatherCard}>
                             <header className={styles.searchResult}>
-                                '{regionQuery}' 날씨를 불러오는 중... <img className={styles.loadingIcon} src={loadingGif} />
+                                {regionQuery ? `'${regionQuery}'` : ''} 날씨를 불러오는 중... <img className={styles.loadingIcon} src={loadingIcon} />
                             </header>
                         </div>
                     </article>
@@ -102,7 +102,7 @@ const Home = ({ regionQuery, weatherResponse, isLoading, errorMessage }) => {
                     <article>
                         <div className={styles.weatherCard}>
                             <header className={styles.searchResult}>
-                                오류 : {errorMessage}
+                                {errorMessage}
                             </header>
                         </div>
                     </article>
@@ -113,7 +113,9 @@ const Home = ({ regionQuery, weatherResponse, isLoading, errorMessage }) => {
                         <article>
                             <div className={styles.weatherCard}>
                                 <header className={styles.searchResult}>
-                                    <div>장소 : <span className={styles.resolvedLocation}>{viewModel.resolvedPlaceName}</span></div>
+                                    {viewModel.resolvedPlaceName && (
+                                        <div>장소 : <span className={styles.resolvedLocation}>{viewModel.resolvedPlaceName}</span></div>
+                                    )}
                                     <div>주소 : <span className={styles.resolvedLocation}>{viewModel.resolvedAddress}</span></div>
                                 </header>
 

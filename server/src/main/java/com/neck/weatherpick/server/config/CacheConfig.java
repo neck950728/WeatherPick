@@ -25,8 +25,8 @@ public class CacheConfig {
             - 출력 : 주소, 장소명, 위ㆍ경도
             주소, 장소명, 위ㆍ경도  ←  이러한 정보는 웬만하면 바뀔 일이 없으므로, TTL을 길게 설정하는 것이 좋다.
         */
-        CaffeineCache kakaoGeo = new CaffeineCache(
-                "kakaoGeo",
+        CaffeineCache kakaoLonLat = new CaffeineCache(
+                "kakaoLonLat",
                 Caffeine.newBuilder()
                         .maximumSize(100) // 최대 100개까지 캐싱(만약 100개가 넘으면, 오래 사용되지 않은 것부터 자동 삭제)
                         .expireAfterWrite(Duration.ofDays(1)) // 캐시에 저장된 지 1일이 지나면, 자동 삭제
@@ -34,7 +34,21 @@ public class CacheConfig {
         );
 
         /*
-            2. 공공데이터포털
+            2. Kakao Maps
+            - 입력 : 위ㆍ경도
+            - 출력 : 주소
+            주소  ←  마찬가지로 이러한 정보는 웬만하면 바뀔 일이 없으므로, TTL을 길게 설정하는 것이 좋다.
+        */
+        CaffeineCache kakaoAddr = new CaffeineCache(
+                "kakaoAddr",
+                Caffeine.newBuilder()
+                        .maximumSize(200)
+                        .expireAfterWrite(Duration.ofDays(1))
+                        .build()
+        );
+
+        /*
+            3. 공공데이터포털
             - 입력 : 기상청 격자 좌표
             - 출력 : 기상청 격자 좌표에 해당하는 지점의 날씨 정보
             날씨는 계속 바뀌므로, 오래 캐싱하면 잘못된 정보가 될 수 있다.
@@ -56,7 +70,7 @@ public class CacheConfig {
         );
 
         /*
-            3. OpenAI
+            4. OpenAI
             - 입력 : 날씨 정보
             - 출력 : 날씨 정보를 기반으로 옷차림/준비물 추천
             OpenAI API는 호출할 때마다 비용/지연이 발생한다.
@@ -71,7 +85,7 @@ public class CacheConfig {
                         .build()
         );
 
-        cm.setCaches(List.of(kakaoGeo, kmaNcst, kmaFcst, aiReco));
+        cm.setCaches(List.of(kakaoLonLat, kakaoAddr, kmaNcst, kmaFcst, aiReco));
         return cm;
     }
 }

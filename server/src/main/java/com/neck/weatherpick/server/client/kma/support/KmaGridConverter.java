@@ -15,7 +15,7 @@ public class KmaGridConverter {
     private static final double XO = 43;
     private static final double YO = 136;
 
-    public static KmaGridPoint convert(double lat, double lon) {
+    public static KmaGridPoint convert(double lon, double lat) {
         double DEGRAD = Math.PI / 180.0;
 
         double re = RE / GRID;
